@@ -1,33 +1,55 @@
 {% extends "layout.html" %}
 {% block title %}To-Do App{% endblock %}
-
 {% block content %}
-  <div class="jumbotron">
-    <h1 class="display-4">To-Do App</h1>
-    <p class="lead">Just another to-do app.</p>
-  </div>
-
-  <div class="row">
-    <div class="col-md-12">
-      <h2>Items</h2>
-      <ul class="list-group mb-4">
-
-        <!-- List the todo items here -->
-        {% for item in all_todo %}
-          <li>{{ item.id }} - {{ item.status }} - {{item.title}} 
-          </li>
+    <div class="col-12-xs">
+      <table class="table table-striped">
+        <thead>
+          <tr>
+            <th>ID</th>
+            <th>Task Title</th>
+            <th>Task Status</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for todo in todos %}
+            <tr>
+              <td>
+                {{ todo.id }}
+              </td>
+              <form action="/update" method="post">
+                <input type="hidden" name="todo_id" value="{{ todo.id }}">
+                <td>  
+                    <input type="text" name="title" value="{{ todo.title }}" class="form-control">
+                </td>
+                <td>
+                    <select name="status" id="status" class="custom-select" id="inputGroupSelect01">
+                      <option selected> {{ todo.status }}</option>
+                      <option value="Not Started">Not Started</option>
+                      <option value="In Progress">In Progress</option>
+                      <option value="Completed">Completed</option>
+                    </select>
+                </td>
+                <td style="text-align:right">
+                  <button type="submit">Upd</button></div>
+                </td>
+              </form>
+              <td>
+                <form action="/delete" method="post">
+                  <input type="hidden" name="todo_id" value="{{todo.id}}">
+                  <div> <button type="submit">Del</button></div>
+                </form>
+              </td>
+            </tr>
           {% endfor %}
-
-      </ul>
-    </div>
-    <form method="post">
-      <ul>
-        <li>
-          <label td_title="ToDo">New ToDo ?</label>
-          <textarea rows="1" cols="60" name="td_Title" style="overflow:hidden"> </textarea> <button type="submit">Add</button>
-        </li>
-        
-      </ul>
+        </tbody>
+      </table>
+      <hr class="mt-3 mb-3"/>
+      <form action="/add" method="post">
+        <div class="input-group mb-3">
+          <input type="text" name="todo_task" id="todo_task" class="form-control" placeholder="To-Do Title">
+            <button type="submit">Add</button>
+        </div>
       </form>
-  </div>
+    </div>
+  
 {% endblock %}
