@@ -1,37 +1,87 @@
-from flask import Flask, render_template, request, redirect, url_for
+import os
+import requests
 import session_items as session
+from flask import Flask, render_template, request, redirect, url_for
+
 app = Flask(__name__)
 app.config.from_object('flask_config.Config')
 
-#changed to the template for local host v2.0
-#unable to complete the sort by status function 
-#new branch created prior to submission
+tr_key=os.getenv("tr_key")
+tr_token=os.getenv("tr_token")
+tr_board=os.getenv("tr_board")
+tr_todo=os.getenv("tr_todo")
+tr_inprogress=os.getenv("tr_inprogress")
+tr_done=os.getenv("tr_done")
 
-#update from work 2.0
+def tr_auth():
+    return {'key': tr_key,'token': tr_token}
+    
+class TrelloTodo:
+    def __init__(self, item_id, name, status):
+        self.item_id = item_id
+        self.name = name
+        self.status = status
+
+def set_list(id, list_id):
+    tr_parameters = tr_auth()
+    tr_parameters['idList'] = list_id
+    return requests.put(f"https://api.trello.com/1/cards/{id}", params=tr_parameters)
+
+def set_bye(id):
+    tr_parameters = tr_auth()
+    return requests.delete(f"https://api.trello.com/1/cards/{id}", params=tr_parameters)
+
 @app.route('/')
 def index():
-    items = session.get_items()
-    return render_template('index.html', todos = items)
+
+    todo_list_api_response_in_json = requests.get('https://api.trello.com/1/lists/' + tr_todo + '/cards', params=tr_auth()).json()
     
-@app.route('/add', methods=["POST"])
-def add_todo():
-    item = request.form.get('todo_task')
-    session.add_item(item)
+    todo_list_api_response = []
+    for iteminjson in todo_list_api_response_in_json:
+        todo_list_api_response.append(TrelloTodo(iteminjson['id'],iteminjson['name'], 'todo'))
+
+    doing_list_api_response_in_json = requests.get('https://api.trello.com/1/lists/' + tr_inprogress + '/cards', params=tr_auth()).json()
+    doing_list_api_response = []
+    for iteminjson in doing_list_api_response_in_json:
+        doing_list_api_response.append(TrelloTodo(iteminjson['id'],iteminjson['name'], 'inprogress'))
+    
+    done_list_api_response_in_json = requests.get('https://api.trello.com/1/lists/' + tr_done + '/cards', params=tr_auth()).json()
+    done_list_api_response = []
+    for iteminjson in done_list_api_response_in_json:
+        done_list_api_response.append(TrelloTodo(iteminjson['id'],iteminjson['name'], 'Done'))
+    
+    return render_template('new_index.html', list_todo=todo_list_api_response, list_doing=doing_list_api_response_in_json, list_done=done_list_api_response_in_json)
+
+
+@app.route('/additem', methods=['post'])
+def add():
+    new_item = request.form.get('new_title')
+    tr_parameters = tr_auth() 
+    tr_parameters['idList'] = tr_todo
+    tr_parameters['name'] = new_item
+    requests.post('https://api.trello.com/1/cards', params=tr_parameters)
     return redirect(url_for('index'))
 
-#delete function 
-@app.route('/delete', methods=["POST"])
-def delete_todo():
-    item = request.form.get('todo_id')
-    print(item)
-    session.delete_item(item)
+@app.route('/m_todoing/<id>', methods=["GET"])
+def set_as_doing(id):
+
+    set_list(id, tr_inprogress)
     return redirect(url_for('index'))
 
-#update function 
-@app.route('/update', methods=["POST"])
-def update_todo():
-    item = request.form.get('todo_id')
-    new_todo_value = request.form.get("title")
-    new_status_value = request.form.get("status")
-    session.update_item(item, new_todo_value, new_status_value)
+@app.route('/m_tobye/<id>', methods=["GET"])
+def say_bye(id):
+
+    set_bye(id)
+    return redirect(url_for('index'))
+
+@app.route('/m_todone/<id>', methods=["GET"])
+def set_as_done(id):
+
+    set_list(id, tr_done)
+    return redirect(url_for('index'))
+
+@app.route('/m_todo/<id>', methods=["GET"])
+def set_as_todo(id):
+
+    set_list(id, tr_todo)
     return redirect(url_for('index'))
