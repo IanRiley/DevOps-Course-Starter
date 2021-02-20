@@ -2,42 +2,26 @@ from flask import session
 
 _DEFAULT_ITEMS = []
 
-
 def get_items():
-    """
-    Fetches all saved items from the session.
-    Returns:
-        list: The list of saved items.
-    """
+# Fetches all saved items from the session.
     return session.get('items', _DEFAULT_ITEMS)
 
+
 def get_item(id):
-    """
-    Fetches the saved item with the specified ID.
-    Args:
-        id: The ID of the item.
-    Returns:
-        item: The saved item, or None if no items match the specified ID.
-    """
+# Fetches the saved ID or None
     items = get_items()
     return next((item for item in items if item['id'] == int(id)), None)
 
+
 def add_item(title):
-    """
-    Adds a new item with the specified title to the session.
-    Args:
-        title: The title of the item.
-    Returns:
-        item: The saved item.
-    """
+#Adds a new item with the title
     items = get_items()
 
-    # Determine the ID for the item based on that of the previously added item
+# Get an ID higher than current
     id = items[-1]['id'] + 1 if items else 0
 
     item = { 'id': id, 'title': title, 'status': "Not Started" }
 
-    # Add the item to the list
     items.append(item)
     session['items'] = items
 
@@ -45,11 +29,7 @@ def add_item(title):
 
 
 def save_item(item):
-    """
-    Updates an existing item in the session. If no existing item matches the ID of the specified item, nothing is saved.
-    Args:
-        item: The item to save.
-    """
+#Update the item with ID, if not valid, skip
     existing_items = get_items()
     updated_items = [item if item['id'] == existing_item['id'] else existing_item for existing_item in existing_items]
 
@@ -57,16 +37,17 @@ def save_item(item):
 
     return item
 
-def delete_item(item_id):
 
+def delete_item(item_id):
+#Delete the ID
     existing_items = get_items()
     session['items'] = [ items for items in existing_items if int(items.get('id')) != int(item_id) ]
     
     return item_id
+ 
 
-#including the status function 
 def update_status(items, status):
-    # Check if the passed status is a valid value
+#Update status (if valid)
     if (status.lower().strip() == 'not started'):
         status = NotStarted
     elif (status.lower().strip() == 'in progress'):
@@ -77,7 +58,9 @@ def update_status(items, status):
         print("Invalid Status: " + status)
         return None
 
+
 def update_item(item_id, new_todo_value, new_status_value):
+#Update text & status
     todo_items = []
     for todo in get_items():
         if int(todo.get('id')) == int(item_id):
