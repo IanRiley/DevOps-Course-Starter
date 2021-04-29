@@ -33,12 +33,13 @@ def set_bye(id):
 
 @app.route('/')
 def index():
-
+    tasks=[]
     todo_list_api_response_in_json = requests.get('https://api.trello.com/1/lists/' + tr_todo + '/cards', params=tr_auth()).json()
     
     todo_list_api_response = []
     for iteminjson in todo_list_api_response_in_json:
         todo_list_api_response.append(TrelloTodo(iteminjson['id'],iteminjson['name'], 'todo'))
+        tasks.append(TrelloTodo(iteminjson['id'],iteminjson['name'], 'todo'))
 
     doing_list_api_response_in_json = requests.get('https://api.trello.com/1/lists/' + tr_inprogress + '/cards', params=tr_auth()).json()
     doing_list_api_response = []
@@ -49,9 +50,11 @@ def index():
     done_list_api_response = []
     for iteminjson in done_list_api_response_in_json:
         done_list_api_response.append(TrelloTodo(iteminjson['id'],iteminjson['name'], 'Done'))
-    
-    return render_template('new_index.html', list_todo=todo_list_api_response, list_doing=doing_list_api_response_in_json, list_done=done_list_api_response_in_json)
 
+# this is to add the view_model    
+    return render_template('new_index.html', list_todo=todo_list_api_response, list_doing=doing_list_api_response_in_json, list_done=done_list_api_response_in_json)
+    item_view_model = viewmodel(tasks)
+#    return render_template('new_index.html', view_model=item_view_model)
 
 
 @app.route('/additem', methods=['post'])
