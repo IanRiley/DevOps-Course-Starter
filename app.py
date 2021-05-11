@@ -1,6 +1,5 @@
 import os
 import requests
-import session_items as session
 import view_model as ViewModel
 import trello_items as Trello
 from flask import Flask, render_template, request, redirect, url_for
