@@ -15,7 +15,7 @@
       <h2>ToDo</h2>
       <ul class="list-group mb-12">
         {% for tditem in list_todo %}
-       <p class="list-group-item list-group-item-action"> {{tditem.name}}<a class="btn btn-outline-info" href="/m_todoing/{{tditem.item_id}}" type="submit">Doing</a><a class="btn btn-outline-info" href="/m_todone/{{tditem.item_id}}" type="submit">Done</a><a class="btn btn-outline-info" href="/m_tobye/{{tditem.id}}" type="submit">Bye</a></p></ul>
+       <p class="list-group-item list-group-item-action"> {{tditem.name}}<a class="btn btn-outline-info" href="/m_todoing/{{tditem.item_id}}" type="submit">Doing</a><a class="btn btn-outline-info" href="/m_todone/{{tditem.item_id}}" type="submit">Done</a><a class="btn btn-outline-info" href="/m_tobye/{{tditem.item_id}}" type="submit">Bye</a></p></ul>
         {% endfor %}
       </ul>
     </div>

@@ -12,11 +12,9 @@ tr_todo=os.getenv("trello_todo")
 tr_inprogress=os.getenv("trello_doing")
 tr_done=os.getenv("trello_done")
 
-
 def trello_auth():
     return {'key': tr_key,'token': tr_token}
     
-
 @app_route('/',methods=['GET'])
 
 todo_list_api_response_in_json = requests.get('https://api.trello.com/1/lists/' + tr_todo + '/cards', params=trello_auth()).json()
