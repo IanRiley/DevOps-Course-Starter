@@ -1,7 +1,7 @@
 import os
 import requests
 import view_model as ViewModel
-import trello_items as Trello
+#import trello_items as Trello
 from flask import Flask, render_template, request, redirect, url_for
 
 app = Flask(__name__)
@@ -50,15 +50,15 @@ def index():
     for iteminjson in done_list_api_response_in_json:
         done_list_api_response.append(TrelloTodo(iteminjson['id'],iteminjson['name'], 'Done'))
     
-    return render_template('new_index.html', list_todo=todo_list_api_response, list_doing=doing_list_api_response_in_json, list_done=done_list_api_response_in_json)
-
+    return render_template('index.html', list_todo=todo_list_api_response, list_doing=doing_list_api_response_in_json, list_done=done_list_api_response_in_json)
+"""
 @app.route('/test')
 def viewall():
 
     items =  Trello.get_items()
     item_view_model = ViewModel(items)
     return render_template('index.html', model=item_view_model)
-
+"""
 @app.route('/additem', methods=['post'])
 def add():
     new_item = request.form.get('new_name')

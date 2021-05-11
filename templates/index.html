@@ -1,55 +1,39 @@
 {% extends "layout.html" %}
-{% block title %}To-Do App{% endblock %}
+{% block title %}Trello ToDo{% endblock %}
 {% block content %}
-    <div class="col-12-xs">
-      <table class="table table-striped">
-        <thead>
-          <tr>
-            <th>ID</th>
-            <th>Task Title</th>
-            <th>Task Status</th>
-          </tr>
-        </thead>
-        <tbody>
-          {% for todo in todos %}
-            <tr>
-              <td>
-                {{ todo.id }}
-              </td>
-              <form action="/update" method="post">
-                <input type="hidden" name="todo_id" value="{{ todo.id }}">
-                <td>  
-                    <input type="text" name="title" value="{{ todo.title }}" class="form-control">
-                </td>
-                <td>
-                    <select name="status" id="status" class="custom-select" id="inputGroupSelect01">
-                      <option selected> {{ todo.status }}</option>
-                      <option value="Not Started">Not Started</option>
-                      <option value="In Progress">In Progress</option>
-                      <option value="Completed">Completed</option>
-                    </select>
-                </td>
-                <td style="text-align:right">
-                  <button type="submit">Upd</button></div>
-                </td>
-              </form>
-              <td>
-                <form action="/delete" method="post">
-                  <input type="hidden" name="todo_id" value="{{todo.id}}">
-                  <div> <button type="submit">Del</button></div>
-                </form>
-              </td>
-            </tr>
-          {% endfor %}
-        </tbody>
-      </table>
-      <hr class="mt-3 mb-3"/>
-      <form action="/add" method="post">
-        <div class="input-group mb-3">
-          <input type="text" name="todo_task" id="todo_task" class="form-control" placeholder="To-Do Title">
-            <button type="submit">Add</button>
-        </div>
-      </form>
+  <div class="col-md-4">
+    <h2>Create a New ToDo</h2>
+    <form action="/additem" method="post">
+        <label for="name">ToDo Title:</label>
+        <input type="text" id="new_name" name="new_name">
+          <button type="submit">Add</button>
+    </form>
+  </div>
+
+  <div class="row">
+    <div class="col-md-4">
+      <h2>ToDo</h2>
+      <ul class="list-group mb-12">
+        {% for tditem in list_todo %}
+       <p class="list-group-item list-group-item-action"> {{tditem.name}}<a class="btn btn-outline-info" href="/m_todoing/{{tditem.item_id}}" type="submit">Doing</a><a class="btn btn-outline-info" href="/m_todone/{{tditem.item_id}}" type="submit">Done</a><a class="btn btn-outline-info" href="/m_tobye/{{tditem.item_id}}" type="submit">Bye</a></p></ul>
+        {% endfor %}
+      </ul>
     </div>
-  
+    <div class="col-md-4">
+      <h2>Doing</h2>
+      <ul class="list-group mb-12">
+        {% for tditem in list_doing %}
+          <p class="list-group-item list-group-item-action"> {{tditem.name}}<a class="btn btn-outline-info" href="/m_todo/{{tditem.id}}" type="submit">To Do</a><a class="btn btn-outline-info" href="/m_todone/{{tditem.id}}" type="submit">Done</a><a class="btn btn-outline-info" href="/m_tobye/{{tditem.id}}" type="submit">Bye</a></p>
+        {% endfor %}
+      </ul>
+    </div>
+    <div class="col-md-4">
+      <h2>Done</h2>
+      <ul class="list-group mb-12">
+        {% for tditem in list_done %}
+          <p class="list-group-item list-group-item-action"> {{tditem.name}}<a class="btn btn-outline-info" href="/m_todo/{{tditem.id}}" type="submit">To Do</a><a class="btn btn-outline-info" href="/m_todoing/{{tditem.id}}" type="submit">Doing</a><a class="btn btn-outline-info" href="/m_tobye/{{tditem.id}}" type="submit">Bye</a></p>
+        {% endfor %}
+      </ul>
+    </div>
+  </div>
 {% endblock %}
