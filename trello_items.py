@@ -7,33 +7,9 @@ app.config.from_object('flask_config.Config')
 
 tr_key=os.getenv("trello_key")
 tr_token=os.getenv("trello_token")
-tr_board=os.getenv("trello_board")
-tr_todo=os.getenv("trello_todo")
-tr_inprogress=os.getenv("trello_doing")
-tr_done=os.getenv("trello_done")
 
 def trello_auth():
     return {'key': tr_key,'token': tr_token}
-    
-@app_route('/',methods=['GET'])
-
-todo_list_api_response_in_json = requests.get('https://api.trello.com/1/lists/' + tr_todo + '/cards', params=trello_auth()).json()
-    
-    class_todo_list_api_response = []
-    for iteminjson in todo_list_api_response_in_json:
-        class_todo_list_api_response.append(Todo(iteminjson['id'],iteminjson['name'], 'To Do'))
-
-    doing_list_api_response_in_json = requests.get('https://api.trello.com/1/lists/' + tr_inprogress + '/cards', params=trello_auth()).json()
-    class_doing_list_api_response = []
-    for iteminjson in doing_list_api_response_in_json:
-        class_doing_list_api_response.append(Todo(iteminjson['id'],iteminjson['name'], 'inprogress'))
-    
-    done_list_api_response_in_json = requests.get('https://api.trello.com/1/lists/' + tr_done + '/cards', params=trello_auth()).json()
-    class_done_list_api_response = []
-    for iteminjson in done_list_api_response_in_json:
-        class_done_list_api_response.append(Todo(iteminjson['id'],iteminjson['name'], 'Done'))
-    
-    return render_template('index.html', list_todo=class_todo_list_api_response, list_doing=doing_list_api_response_in_json, list_done=done_list_api_response_in_json)
 
 def create_board(board_name):
     url = "https://api.trello.com/1/boards/"
@@ -55,3 +31,17 @@ def create_card(list_id, card_name):
     response = requests.request("POST", url, params=querystring)
     card_id = response.json()["id"]
     return card_id
+
+
+def get_items():
+
+# how to get the cards
+    cards=[]
+#    cards = get_cards()
+
+    items = []
+    for card_list in cards:
+        for card in card_list['cards']:
+            items.append(Item.fromTrelloCard(card, card_list))
+
+    return items

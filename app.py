@@ -1,6 +1,8 @@
 import os
 import requests
 import session_items as session
+import view_model as ViewModel
+import trello_items as Trello
 from flask import Flask, render_template, request, redirect, url_for
 
 app = Flask(__name__)
@@ -51,15 +53,21 @@ def index():
     
     return render_template('new_index.html', list_todo=todo_list_api_response, list_doing=doing_list_api_response_in_json, list_done=done_list_api_response_in_json)
 
+@app.route('/test')
+def viewall():
+
+    items =  Trello.get_items()
+    item_view_model = ViewModel(items)
+    return render_template('index.html', model=item_view_model)
+
 @app.route('/additem', methods=['post'])
 def add():
-    new_item = request.form.get('new_title')
+    new_item = request.form.get('new_name')
     tr_parameters = tr_auth() 
     tr_parameters['idList'] = tr_todo
     tr_parameters['name'] = new_item
     requests.post('https://api.trello.com/1/cards', params=tr_parameters)
     return redirect(url_for('index'))
-
 
 @app.route('/m_todoing/<id>', methods=["GET"])
 def set_as_doing(id):
