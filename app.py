@@ -2,6 +2,7 @@ import os
 import requests
 import session_items as session
 from flask import Flask, render_template, request, redirect, url_for
+from dotenv import load_dotenv
 
 app = Flask(__name__)
 app.config.from_object('flask_config.Config')
@@ -12,6 +13,14 @@ tr_board=os.getenv("trello_board")
 tr_todo=os.getenv("trello_todo")
 tr_inprogress=os.getenv("trello_doing")
 tr_done=os.getenv("trello_done")
+
+#tr_key=os.getenv("tr_key")
+#tr_token=os.getenv("tr_token")
+#tr_board=os.getenv("tr_board")
+#tr_todo=os.getenv("tr_todo")
+#tr_inprogress=os.getenv("tr_inprogress")
+#tr_done=os.getenv("tr_done")
+
 
 def tr_auth():
     return {'key': tr_key,'token': tr_token}
@@ -33,13 +42,12 @@ def set_bye(id):
 
 @app.route('/')
 def index():
-    tasks=[]
+
     todo_list_api_response_in_json = requests.get('https://api.trello.com/1/lists/' + tr_todo + '/cards', params=tr_auth()).json()
     
     todo_list_api_response = []
     for iteminjson in todo_list_api_response_in_json:
         todo_list_api_response.append(TrelloTodo(iteminjson['id'],iteminjson['name'], 'todo'))
-        tasks.append(TrelloTodo(iteminjson['id'],iteminjson['name'], 'todo'))
 
     doing_list_api_response_in_json = requests.get('https://api.trello.com/1/lists/' + tr_inprogress + '/cards', params=tr_auth()).json()
     doing_list_api_response = []
@@ -50,11 +58,10 @@ def index():
     done_list_api_response = []
     for iteminjson in done_list_api_response_in_json:
         done_list_api_response.append(TrelloTodo(iteminjson['id'],iteminjson['name'], 'Done'))
-
+    
     return render_template('new_index.html', list_todo=todo_list_api_response, list_doing=doing_list_api_response_in_json, list_done=done_list_api_response_in_json)
-# this is to add the view_model    
-#    my_view_model = ViewModel.build_from_json(api_responses.api_todo, api_responses.api_doing, api_responses.api_done)
-#    return render_template('new_index.html', view_model=my_view_model)
+
+
 
 @app.route('/additem', methods=['post'])
 def add():
